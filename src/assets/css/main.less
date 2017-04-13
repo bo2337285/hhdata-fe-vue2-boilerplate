@@ -1,0 +1,43 @@
+html,body{.static-full;position: relative;margin:0;padding: 0;font-family:"Helvetica Neue","PingFang SC",Arial,sans-serif;}
+.flex-display{
+  display:-webkit-box;display:-ms-flexbox;display:flex;
+}
+.static-full{
+  width: 100%;height: 100%;
+}
+.absolute-full{
+  position: absolute;top: 0;left: 0;right: 0;bottom: 0;
+}
+.flex(@val){
+  -webkit-box-flex:@val;-ms-flex:@val;flex:@val;
+}
+#app{
+  .static-full;
+  .flex-display;
+  flex-direction: column;
+}
+// .header{display: block;height: 10px;.flex(0 0 10px);}
+.header{display: block;transition:all .5s ease;border-top:solid 4px #3091F2;background-color:#fff;box-shadow:0 2px 4px 0 rgba(0,0,0,.12),0 0 6px 0 rgba(0,0,0,.04)}
+// header.header-fixed{position:fixed;top:0;left:0;right:0}
+// header .el-menu-demo{padding-left:300px!important}
+.main{.flex(1 1 auto);overflow: hidden;position: relative;}
+.main .main-wrap{.flex-display;.absolute-full;background-color:#FCFCFC;}
+.main .main-left{text-align:center;-webkit-box-flex:0;-ms-flex:0 0 200px;flex:0 0 200px;text-align:left}
+.main .el-menu-vertical-demo{height:100%;overflow-y:auto}
+.main .main-right{.flex(1);background-color:#fff;position: relative;border:solid 10px #e4e8f1;overflow:auto}
+.tabs{.absolute-full;overflow: hidden;.flex-display;flex-direction: column;}
+.tabs .el-tabs__header{margin-bottom: 10px;}
+.tabs .el-tabs__content{overflow: auto;box-sizing: border-box;margin-bottom: 10px;}
+.tabs-panel{padding: 0 10px;box-sizing: border-box;height: 100%;}
+.tabs-panel-view{}
+.router-link{display:inline-block;width:100%;height:100%;text-align:center;color:#475669;text-decoration:none}
+.is-active .router-link{color:#20a0ff}
+.el-form-item .el-radio+.el-radio{margin-left:30px!important}
+.fade-enter-active,.fade-leave-active{transition:all .5s}
+.fade-enter,.fade-leave-active{opacity:0}
+.list-enter-active,.list-leave-active{transition:all 1s}
+.list-enter,.list-leave-active{opacity:0;transform:translateY(30px)}
+.isActive{color:#20a0ff!important}
+#app .main .aside .is-active{color:#475669}
+.el-card{overflow:visible!important}
+.router-link{color:#fff;text-align:left}
