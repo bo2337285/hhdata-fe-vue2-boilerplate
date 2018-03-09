@@ -1,0 +1,157 @@
+// .ms input{
+//   width: 200px;
+// }
+*{
+  box-sizing: border-box;
+}
+.modalSelect .el-dialog__body, .modalSelect .el-button--text{
+  font-size: 13px;
+}
+.modalSelect{
+  .el-dialog__body {
+    min-height: 400px;
+    padding: 10px 20px;
+  }
+  .top {
+    padding: 5px 0px;
+    height: 40px;
+    position: relative;
+    margin-bottom: 5px;
+  }
+  .top .searchInput{
+    display: inline-block;
+    width: 80%;
+  }
+  .top .searchBtn{
+    position: absolute;
+    right: 0;
+  }
+  .bread {
+    padding: 15px 0;
+    height: 45px;
+    line-height: 15px;
+  }
+  .breadAfter:after{
+    content: "顶层";
+    color: #ddd;
+  }
+  .bread .el-breadcrumb__item:last-child .el-breadcrumb__item__inner {
+    color: #48576a;
+    cursor: pointer;
+  }
+  .bread .el-breadcrumb__item{
+    float: none;
+  }
+  .bread .el-breadcrumb__item:last-child .el-breadcrumb__item__inner:hover{
+    color: #20a0ff;
+    cursor: pointer;
+  }
+  .bread .el-breadcrumb{
+    height: 15px;
+    line-height: 15px;
+  }
+  .panel{
+    padding: 10px;
+    height: 100px;
+    background-color: #ddd;
+    border-radius: 4px;
+    overflow: auto;
+  }
+  .panelNodata{
+    content: "暂无选中项";
+    color: #ddd;
+  }
+  .list{
+    border: 1px solid #e9e9e9;
+    height: 252px;
+    overflow-y: auto;
+  }
+  .listTitle {
+    background-color: #108ee9;
+    text-align: center;
+  }
+  // .titleItem:nth-child(1) {
+  //   width: 15%;
+  // }
+  // .titleItem:nth-child(2) {
+  //   border-left: 1px solid #fff;
+  //   width: 55%;
+  // }
+  // .titleItem:nth-child(3) {
+  //   border-left: 1px solid #fff;
+  //   width: 30%;
+  // }
+  .listContent {
+    height: 220px;
+  }
+  .listContent table, .listTitle table {
+    overflow-y: auto;
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .listContent table tr,.listTitle table tr {
+    height: 25px;
+    line-height: 25px;
+  }
+  .listContent .item-type,.listTitle .item-type {
+    width: 15%;
+  }
+  .listContent table tr td,.listTitle table tr td {
+      border: 1px solid #ddd;
+      padding: 0 5px;
+  }
+  .listContent .item-path,.listTitle .item-path {
+    width: 30%;
+  }
+  .listContent .labelStyle{
+    padding: 10px 0px;
+    display: inline-block;
+    line-height: 15px;
+  }
+  .titleItem{
+      color: white;
+      // display: inline-block;
+      height: 30px;
+      line-height: 30px;
+      border: none !important;
+  }
+  .titleItem:nth-child(2) {
+     border-left: 1px solid #fff !important;
+   }
+   .titleItem:nth-child(3) {
+     border-left: 1px solid #fff !important;
+   }
+   .name-label{
+     margin-left: 5px;
+   }
+   .hhrms-source {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-color: #fff;
+      background-image: none;
+      border-radius: 4px;
+      border: 1px solid #bfcbd9;
+      box-sizing: border-box;
+      color: #1f2d3d;
+      display: block;
+      font-size: inherit;
+      height: 36px;
+      line-height: 1;
+      outline: 0;
+      padding: 3px 10px;
+      transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+      width: 100%;
+  }
+  .hhrms-source{
+      padding-right: 32px !important;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 12px;
+      background: #fff url(img/hhms-img-active.png) no-repeat right center;
+      background-color: #fff !important;
+      cursor: pointer;
+  }
+  .el-dialog__footer{
+    text-align: center;
+  }
+}
