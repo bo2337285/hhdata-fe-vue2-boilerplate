@@ -13,13 +13,13 @@ var exportText = "";//拼export用
 files.forEach(function(filepath) {
    var split = filepath.split('/');
    var name = split[split.length - 2];//模块名
-   text += "const "+ name +" = r => require.ensure([], () => r(require('./page/"+name+"/index.vue')), '"+name+"');\n"
+   text += "const "+ name +" = r => require.ensure([], () => r(require('src/page/"+name+"/index.vue')), '"+name+"');\n"
    exportText += "\n  "+ name + ","
  });
  //拼最后export部分
  text += "\nexport default {"+exportText+"\n}"
 
-fs.writeFile(path.join(__dirname,"../src/pages.js"),text,function (err) {
+fs.writeFile(path.join(__dirname,"../src/page/pages.js"),text,function (err) {
   if (err) throw err;
   console.log('写入功能模块列表完成');
 })

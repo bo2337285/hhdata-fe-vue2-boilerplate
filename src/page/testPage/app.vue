@@ -239,7 +239,7 @@ export default {
     },
     getData: async function () {
       let res = await getLinkData();
-      this.tableData = res.default.list;
+      this.tableData = res? res.list : [];
     },
     onSubmit: function () {
       this.addFormParams();

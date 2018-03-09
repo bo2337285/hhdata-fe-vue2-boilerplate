@@ -1,6 +1,6 @@
 {
   "name": "wfp-vue-dev-bj",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "WFP-vue",
   "author": "bo",
   "private": false,
@@ -10,13 +10,16 @@
     "clear": "rimraf dist"
   },
   "dependencies": {
+    "animate.less": "^2.2.0",
     "echarts": "^3.4.0",
-    "element-ui": "^1.2.4",
+    "element-ui": "1.2.4",
+    "font-awesome": "^4.7.0",
     "glob": "^7.1.1",
     "less": "^2.7.2",
     "less-loader": "^3.0.0",
     "lodash": "^4.17.4",
     "lodash.debounce": "^4.0.8",
+    "moment": "^2.18.1",
     "vue": "2.1.6"
   },
   "devDependencies": {

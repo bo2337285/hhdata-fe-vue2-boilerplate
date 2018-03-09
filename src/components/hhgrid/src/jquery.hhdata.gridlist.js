@@ -603,7 +603,7 @@ import jQuery from 'jquery'
 			.on('click','.grid-col-prompt-trigger',onColPromptShow)
 			.on('click','.grid-col-prompt-submit',onColPromptSubmit)
 			.on('click','.grid-col-prompt-keep',onColPromptSave)
-			// .on('click','.grid-col-prompt-chk',onColPromptCheck)
+			.on('click','.grid-col-prompt-chk',onColPromptCheck)
 			.on('click','.grid-col-prompt-chk-all',onColPromptCheckAll)
 			.on('click','.grid-col-prompt-cancel',onColPromptCancel)
 			.on('click','.grid-col-prompt-li',onColPromptSelected)
@@ -762,6 +762,7 @@ import jQuery from 'jquery'
 			if (opts.gridQuery) {
 				resetGridQuery();//重置内过滤
 			}
+			synChkAll();//同步全选
 			//回调
 			_self.opt.table.onRenderDataFinish();
 			_self.loading = false;
@@ -966,13 +967,15 @@ import jQuery from 'jquery'
 					$td = $pTr.children("td").eq(idx);
 					//建立dom与col,row,cell之间的关系
 					buildRelation($td,col,row)
+					var $div = $rows.find("div.grid-chk-div");
 					if (col.isChk) {//选择列
-						var $div = $rows.find("div.grid-chk-div"),
-								// $checkbox = $div.find(':checkbox'),
-								$checkbox = $("<input type='checkbox' class='g-chk' />").appendTo($div),
-								name = opts.table.checkboxName;
-						$checkbox[0].checked = row.chk;
-						// $checkbox[0].checked = !!utilFn.getDeepVal(rowData,name)
+						if (row.isExt) {//汇总行不显示复选框
+							$div.html("-");
+						}else{
+							var $checkbox = $("<input type='checkbox' class='g-chk' />").appendTo($div),
+							name = opts.table.checkboxName;
+							$checkbox[0].checked = row.chk;
+						}
 						$td = $div.parents("td");
 					}else if (col.isNum) {//序号列
 						$td = $rows.find("td[data-number]");
@@ -1029,12 +1032,30 @@ import jQuery from 'jquery'
 		}
 		var onChk = function (e) {
 			var $chk = $(this),
-					$td = $chk.parents("td"),
-					$row = $chk.parents("tr"),
+			 		_self = grid,
+					$td = $chk.parents("td"), $row = $chk.parents("tr"),
 					row = $row[0]._row;
 			row.chk = this.checked;
 			opts.table.onChecked.call(grid,row.dom,$td,row.data,this.checked);
+			//同步全选
+			synChkAll()
 			e.stopPropagation();
+		}
+		var synChkAll = function () {
+			var flag = true,_self = grid,
+					checkAll = _self.$element.find(".g-chk-all")[0];
+			if (!!!checkAll)  return;
+			if (!_self.renderRows || !_self.renderRows.length) {
+				checkAll.checked = false;
+			}else {
+				$.each(_self.renderRows,function(i, _row) {
+					if(!_row.chk){//找其中选中的
+						flag = false;
+						return false;
+					}
+				});
+				checkAll.checked = !!flag;//控制全选
+			}
 		}
 		var onChkAll = function () {
 			var $t = $(this),
@@ -1221,25 +1242,22 @@ import jQuery from 'jquery'
 				dataCols = grid.header.colMap.dataCols,
 				postfixedCols = grid.header.colMap.postfixedCols;
 			$prompt.toggleClass('active');
+			onColPromptCheck();
 			opts.onColPromptShow.apply(gridlist, [colList,fixedCols,dataCols,postfixedCols]);
 		}
 		var onColPromptCheck = function (event) {
 			var _self = grid,
-				currChk = event.target,
-				flag = false,
-				$grid = _self.$element,
-				$prompt = $grid.find(".grid-col-prompt"),
-				$promptContent = $prompt.find(".grid-col-prompt-content");
+			  flag = true,//判断是否已经全选
+			  $grid = _self.$element, $prompt = $grid.find(".grid-col-prompt"),
+			  $promptContent = $prompt.find(".grid-col-prompt-content"),
+				checkAll = $prompt.find('.grid-col-prompt-chk-all')[0];
 			$promptContent.find(".grid-col-prompt-chk").each(function(i, chk) {
-				if(chk.checked){
-					flag = true;
+				if(!chk.checked){//找其中选中的
+					flag = false;
 					return false;
 				}
 			});
-			if (!flag) {//至少选一项
-				currChk.checked = true;
-			}
-			event.stopPropagation();
+			checkAll.checked = !!flag;//控制全选
 		}
 		var onColPromptCheckAll = function (event) {
 			var _self = grid,
@@ -1310,10 +1328,12 @@ import jQuery from 'jquery'
 			var $grid = grid.$element,
 					$promptContent = $grid.find(".grid-col-prompt-content"),
 					$li = $promptContent.find(".grid-col-prompt-li.active");
-			if (!$li.length) return;
-			var	$prev = $li.prev(),
-					col = $li[0]._col;
-			if ($prev.length && $prev.is(":visible") &&!($prev[0]._col.fixed && !col.fixed )) {
+			var	$prev = $li.prev();
+			if (!$li.length || !$prev.length || !$prev.is(":visible")) return;
+			var col = $li[0]._col, pCol = $prev[0]._col;
+			if (
+					!((pCol.fixed && !col.fixed) || (col.postFixed && !pCol.postFixed ))
+				) {
 				$li.insertBefore($prev);
 			}
 		}
@@ -1321,10 +1341,12 @@ import jQuery from 'jquery'
 			var $grid = grid.$element,
 					$promptContent = $grid.find(".grid-col-prompt-content"),
 					$li = $promptContent.find(".grid-col-prompt-li.active");
-			if (!$li.length) return;
-			var	$next = $li.next(),
-					col = $li[0]._col;
-			if ($next.length && $next.is(":visible") && !(!$next[0]._col.fixed && col.fixed )) {
+			var	$next = $li.next();
+			if (!$li.length || !$next.length || !$next.is(":visible")) return;
+			var col = $li[0]._col, nCol = $next[0]._col;
+			if (
+					!((!nCol.fixed && col.fixed )|| (nCol.postFixed && !col.postFixed ))
+				) {
 				$li.insertAfter($next);
 			}
 		}
@@ -1425,16 +1447,16 @@ import jQuery from 'jquery'
 						callback = opts.onGridQuery,
 						outRows = [];
 				//输入内容为 列名:关键字，则找出该列并以该列来过滤
-				if(/[^:]+:[^:]+/.test(keyword)){
-					var colText = keyword.replace(/([^:]+):[^:]+/,"$1"),
-							word = keyword.replace(/[^:]+:([^:]+)/,"$1");
-					$.each(cols,function(i, col) {
-						if (col.text == colText) {
-							currCol = col;
-						}
-					});
-					keyword = word;
-				}
+				// if(/[^:]+:[^:]+/.test(keyword)){
+				// 	var colText = keyword.replace(/([^:]+):[^:]+/,"$1"),
+				// 			word = keyword.replace(/[^:]+:([^:]+)/,"$1");
+				// 	$.each(cols,function(i, col) {
+				// 		if (col.text == colText) {
+				// 			currCol = col;
+				// 		}
+				// 	});
+				// 	keyword = word;
+				// }
 
 				if(!!callback && typeof(callback) == 'function'){//回调函数
 					outRows = callback.apply(_self, [keyword,rows,currCol]);
@@ -1645,14 +1667,19 @@ import jQuery from 'jquery'
 			var _self = grid,
 				$grid = _self.$element,
 				scrollEle = $grid.find(".grid-body-scrollEle")[0],
-				w = Math.max(scrollEle.clientWidth- (scrollEle.scrollWidth - scrollEle.clientWidth),50),
-				h = Math.max(scrollEle.clientHeight- (scrollEle.scrollHeight - scrollEle.clientHeight),50),
+				scrollEleHead = $grid.find(".grid-head-data").find(".grid-scroll-wrap")[0],
+				clientWidth = Math.max(scrollEle.clientWidth,scrollEleHead.clientWidth),
+				scrollWidth = Math.max(scrollEle.scrollWidth,scrollEleHead.scrollWidth),
+				clientHeight = scrollEle.clientHeight,
+				scrollHeight = scrollEle.scrollHeight,
+				w = Math.max(clientWidth- (scrollWidth - clientWidth),50),
+				h = Math.max(clientHeight- (scrollHeight - clientHeight),50),
 				$x = $grid.$x,
 				$y = $grid.$y;
 			scrollEle.scrollBarWidth = w;
 			scrollEle.scrollBarHeight = h;
-			$x.toggle(scrollEle.scrollWidth - scrollEle.clientWidth > 2 && scrollEle.scrollWidth > 50);//可滚动距离在2px以内则不展示滚动条
-			$y.toggle(scrollEle.scrollHeight - scrollEle.clientHeight > 2 && scrollEle.scrollHeight>50);
+			$x.toggle(scrollWidth - clientWidth > 2 && scrollWidth > 50);//可滚动距离在2px以内则不展示滚动条
+			$y.toggle(scrollHeight - clientHeight > 2 && scrollHeight > 50);
 			$x.width(w);
 			$y.height(h);
 
@@ -1662,10 +1689,17 @@ import jQuery from 'jquery'
 			var _self = grid,
 				$grid = _self.$element,
 				scrollEle = $grid.find(".grid-body-scrollEle")[0],
+				scrollEleHead = $grid.find(".grid-head-data").find(".grid-scroll-wrap")[0],
+				clientWidth = Math.max(scrollEle.clientWidth,scrollEleHead.clientWidth),
+				scrollWidth = Math.max(scrollEle.scrollWidth,scrollEleHead.scrollWidth),
+				scrollLeft = Math.max(scrollEle.scrollLeft,scrollEleHead.scrollLeft),
+				scrollTop = scrollEle.scrollTop,
+				clientHeight = scrollEle.clientHeight,scrollBarWidth = scrollEle.scrollBarWidth,
+				scrollHeight = scrollEle.scrollHeight,scrollBarHeight = scrollEle.scrollBarHeight,
 				$x = $grid.$x,
 				$y = $grid.$y;
-			$x[0].style.left = ((scrollEle.clientWidth - scrollEle.scrollBarWidth) * scrollEle.scrollLeft / (scrollEle.scrollWidth - scrollEle.clientWidth)) + 'px';
-			$y[0].style.top = ((scrollEle.clientHeight - scrollEle.scrollBarHeight) * scrollEle.scrollTop / (scrollEle.scrollHeight - scrollEle.clientHeight)) + 'px';
+			$x[0].style.left = ((clientWidth - scrollBarWidth) * scrollLeft / (scrollWidth - clientWidth)) + 'px';
+			$y[0].style.top = ((clientHeight - scrollBarHeight) * scrollTop / (scrollHeight - clientHeight)) + 'px';
 		}
 		//设置滚动条事件
 		var setScrollEvent =function  () {
@@ -1675,7 +1709,7 @@ import jQuery from 'jquery'
 				$scrollEleHead = $grid.find(".grid-head-data").wrapInner("<div class='grid-scroll-wrap'></div>").find(".grid-scroll-wrap"),
 				$scrollEleExt = $grid.find(".grid-ext-data").wrapInner("<div class='grid-scroll-wrap'></div>").find(".grid-scroll-wrap"),
 				$fixedEle = $grid.find(".grid-body-fixed,.grid-body-post-fixed"),
-			 	scrollEle = $scrollEle[0],
+			 	scrollEle = $scrollEle[0],scrollEleHead = $scrollEleHead[0],
 			 	$x = $grid.$x,//x滑块
 				$y = $grid.$y,//y滑块
 				scrollPageY = 0,scrollY = 0,//y滚动
@@ -1700,16 +1734,24 @@ import jQuery from 'jquery'
 			//移动
 			$grid.on("mousemove",function  (e) {
 				if(!isScorlling) return;
-				var per;
+				var per,
+						clientWidth = Math.max(scrollEle.clientWidth,scrollEleHead.clientWidth),
+						scrollWidth = Math.max(scrollEle.scrollWidth,scrollEleHead.scrollWidth),
+						scrollLeft = Math.max(scrollEle.scrollLeft,scrollEleHead.scrollLeft),
+						scrollTop = scrollEle.scrollTop,
+						clientHeight = scrollEle.clientHeight,scrollBarWidth = scrollEle.scrollBarWidth,
+						scrollHeight = scrollEle.scrollHeight,scrollBarHeight = scrollEle.scrollBarHeight;
 				if(isY){
-					per = (scrollEle.scrollHeight - scrollEle.clientHeight) / (scrollEle.clientHeight - scrollEle.scrollBarHeight);
-					scrollEle.scrollTop = scrollY - (scrollPageY - e.clientY) * per;
-					$fixedEle.scrollTop(scrollEle.scrollTop)
+					per = (scrollHeight - clientHeight) / (clientHeight - scrollBarHeight);
+					var scrollTop =  scrollY - (scrollPageY - e.clientY) * per;
+					scrollEle.scrollTop = scrollTop;
+					$fixedEle.scrollTop(scrollTop)
 				}else{
-					per = (scrollEle.scrollWidth - scrollEle.clientWidth) / (scrollEle.clientWidth - scrollEle.scrollBarWidth);
-					scrollEle.scrollLeft = scrollX - (scrollPageX - e.clientX) * per;
-					$scrollEleHead.scrollLeft(scrollEle.scrollLeft);
-					$scrollEleExt.scrollLeft(scrollEle.scrollLeft);
+					per = (scrollWidth - clientWidth) / (clientWidth - scrollBarWidth);
+					var scrollLeft = scrollX - (scrollPageX - e.clientX) * per;
+					scrollEle.scrollLeft = scrollLeft;
+					$scrollEleHead.scrollLeft(scrollLeft);
+					$scrollEleExt.scrollLeft(scrollLeft);
 				}
 				setScrollPos();
 			})

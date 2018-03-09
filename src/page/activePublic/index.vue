@@ -21,7 +21,6 @@
 </template>
 
   <script>
-    import store from 'src/store.js'
     import $ from 'jquery'
     // import VueRouter from 'vue-router'
 

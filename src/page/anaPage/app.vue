@@ -269,7 +269,8 @@ export default {
     },
     getData: async function () {
       let res = await getLinkData();
-      this.tableData = res.default.list;
+      // console.log(res);
+      this.tableData = res? res.list : [];
     },
     onSubmit: function () {
       this.addFormParams();

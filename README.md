@@ -1,6 +1,3 @@
-# 基于vue和Element的后台管理系统
-> 升级为vue@2.16 + Element@1.0.9
-
 ## Build Setup
 
 ``` bash

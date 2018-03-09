@@ -46,7 +46,7 @@
 </template>
 <script>
   import addressData from '../assets/js/addressData.js'
-  import store from 'src/store.js'
+  import store from 'src/store/index'
 
   function formatData(data){
     var result = [];

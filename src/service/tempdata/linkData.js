@@ -63,7 +63,7 @@ for (var i = 0; i < 100; i++) {
   list.push(o)
 }
 
-export default{
+export default {
     list: list,
     data: [
         {

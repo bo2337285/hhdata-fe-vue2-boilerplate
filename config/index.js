@@ -4,10 +4,12 @@ var path = require('path')
 module.exports = {
   build: {
     env: require('./prod.env'),
-    index: path.resolve(__dirname, '../dist/index.html'),
-    assetsRoot: path.resolve(__dirname, '../dist'),
+    index: path.resolve(__dirname, 'D:/workspace/WFP_v1/src/main/webapp/index.html'),//输出网页目录
+    assetsRoot: path.resolve(__dirname, 'D:/workspace/WFP_v1/src/main/webapp'),//输出资源目录
+    //index: path.resolve(__dirname, '../dist/index.html'),
+    //assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
-    assetsPublicPath: '',
+    assetsPublicPath: '/wfp/',
     productionSourceMap: true,
     // Gzip off by default as many popular static hosts such as
     // Surge or Netlify already gzip all static assets for you.
